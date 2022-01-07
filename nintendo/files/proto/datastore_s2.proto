@@ -1,8 +1,45 @@
 import datastore;
-import coconut;
+
+
+// Coconut Stuff
+
+struct CoconutMeta {
+    uint64 data_id;
+    uint64 tweet_id;
+    uint8 region;
+    uint8 post_type;
+    uint8 theme_id;
+    uint32 festival_id;
+    string language;
+    qbuffer binary_data;
+}
+
+struct CoconutGetInfo {
+    DataStoreReqGetInfo info;
+    CoconutMeta meta;
+}
+
+struct CoconutGetParam {
+    list<uint64> unique_ids;
+    uint8 get_type;
+    uint8 region;
+    uint32 festival_id;
+}
+
+struct CoconutViolation {
+    uint64 data_id;
+    string category_code;
+    string reason;
+}
+
+
+
+// DataStore Stuff
 
 protocol DataStore_S2 : DataStore {
+    method(47) coconut_register_meta(CoconutMeta meta, string url) {}
+    method(48) coconut_rate_post(uint64 data_id) {}
     method(49) coconut_get_object_infos(CoconutGetParam param) {
-        
+        // list<
     }
 }

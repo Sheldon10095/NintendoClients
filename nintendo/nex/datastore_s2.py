@@ -1324,6 +1324,64 @@ class DataStoreTouchObjectParam(common.Structure):
 		stream.u64(self.access_password)
 
 
+class CoconutMeta(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.data_id = None
+		self.tweet_id = None
+		self.region = None
+		self.post_type = None
+		self.theme_id = None
+		self.festival_id = None
+		self.language = None
+		self.binary_data = None
+	
+	def check_required(self, settings, version):
+		for field in ['data_id', 'tweet_id', 'region', 'post_type', 'theme_id', 'festival_id', 'language', 'binary_data']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.data_id = stream.u64()
+		self.tweet_id = stream.u64()
+		self.region = stream.u8()
+		self.post_type = stream.u8()
+		self.theme_id = stream.u8()
+		self.festival_id = stream.u32()
+		self.language = stream.string()
+		self.binary_data = stream.qbuffer()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u64(self.data_id)
+		stream.u64(self.tweet_id)
+		stream.u8(self.region)
+		stream.u8(self.post_type)
+		stream.u8(self.theme_id)
+		stream.u32(self.festival_id)
+		stream.string(self.language)
+		stream.qbuffer(self.binary_data)
+
+
+class CoconutGetInfo(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.info = DataStoreReqGetInfo()
+		self.meta = CoconutMeta()
+	
+	def check_required(self, settings, version):
+		pass
+	
+	def load(self, stream, version):
+		self.info = stream.extract(DataStoreReqGetInfo)
+		self.meta = stream.extract(CoconutMeta)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.add(self.info)
+		stream.add(self.meta)
+
+
 class CoconutGetParam(common.Structure):
 	def __init__(self):
 		super().__init__()
@@ -1349,6 +1407,30 @@ class CoconutGetParam(common.Structure):
 		stream.u8(self.get_type)
 		stream.u8(self.region)
 		stream.u32(self.festival_id)
+
+
+class CoconutViolation(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.data_id = None
+		self.category_code = None
+		self.reason = None
+	
+	def check_required(self, settings, version):
+		for field in ['data_id', 'category_code', 'reason']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.data_id = stream.u64()
+		self.category_code = stream.string()
+		self.reason = stream.string()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u64(self.data_id)
+		stream.string(self.category_code)
+		stream.string(self.reason)
 
 
 class DataStoreProtocolS2:
@@ -1398,6 +1480,8 @@ class DataStoreProtocolS2:
 	METHOD_RATE_OBJECTS_WITH_POSTING = 44
 	METHOD_GET_OBJECT_INFOS = 45
 	METHOD_SEARCH_OBJECT_LIGHT = 46
+	METHOD_COCONUT_REGISTER_META = 47
+	METHOD_COCONUT_RATE_POST = 48
 	METHOD_COCONUT_GET_OBJECT_INFOS = 49
 	
 	PROTOCOL_ID = 0x73
@@ -2129,6 +2213,33 @@ class DataStoreClientS2(DataStoreProtocolS2):
 		logger.info("DataStoreClientS2.search_object_light -> done")
 		return result
 	
+	async def coconut_register_meta(self, meta, url):
+		logger.info("DataStoreClientS2.coconut_register_meta()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(meta)
+		stream.string(url)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_COCONUT_REGISTER_META, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.coconut_register_meta -> done")
+	
+	async def coconut_rate_post(self, data_id):
+		logger.info("DataStoreClientS2.coconut_rate_post()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.u64(data_id)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_COCONUT_RATE_POST, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.coconut_rate_post -> done")
+	
 	async def coconut_get_object_infos(self, param):
 		logger.info("DataStoreClientS2.coconut_get_object_infos()")
 		#--- request ---
@@ -2192,6 +2303,8 @@ class DataStoreServerS2(DataStoreProtocolS2):
 			self.METHOD_RATE_OBJECTS_WITH_POSTING: self.handle_rate_objects_with_posting,
 			self.METHOD_GET_OBJECT_INFOS: self.handle_get_object_infos,
 			self.METHOD_SEARCH_OBJECT_LIGHT: self.handle_search_object_light,
+			self.METHOD_COCONUT_REGISTER_META: self.handle_coconut_register_meta,
+			self.METHOD_COCONUT_RATE_POST: self.handle_coconut_rate_post,
 			self.METHOD_COCONUT_GET_OBJECT_INFOS: self.handle_coconut_get_object_infos,
 		}
 	
@@ -2730,6 +2843,19 @@ class DataStoreServerS2(DataStoreProtocolS2):
 			raise RuntimeError("Expected DataStoreSearchResult, got %s" %response.__class__.__name__)
 		output.add(response)
 	
+	async def handle_coconut_register_meta(self, client, input, output):
+		logger.info("DataStoreServerS2.coconut_register_meta()")
+		#--- request ---
+		meta = input.extract(CoconutMeta)
+		url = input.string()
+		await self.coconut_register_meta(client, meta, url)
+	
+	async def handle_coconut_rate_post(self, client, input, output):
+		logger.info("DataStoreServerS2.coconut_rate_post()")
+		#--- request ---
+		data_id = input.u64()
+		await self.coconut_rate_post(client, data_id)
+	
 	async def handle_coconut_get_object_infos(self, client, input, output):
 		logger.info("DataStoreServerS2.coconut_get_object_infos()")
 		#--- request ---
@@ -2918,6 +3044,14 @@ class DataStoreServerS2(DataStoreProtocolS2):
 	
 	async def search_object_light(self, *args):
 		logger.warning("DataStoreServerS2.search_object_light not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def coconut_register_meta(self, *args):
+		logger.warning("DataStoreServerS2.coconut_register_meta not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def coconut_rate_post(self, *args):
+		logger.warning("DataStoreServerS2.coconut_rate_post not implemented")
 		raise common.RMCError("Core::NotImplemented")
 	
 	async def coconut_get_object_infos(self, *args):

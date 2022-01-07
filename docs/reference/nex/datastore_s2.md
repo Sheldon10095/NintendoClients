@@ -9,7 +9,10 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**class** [DataStoreServerS2](#datastoreservers2)</code><br>
 <span class="docs">The server for the `DataStoreProtocolS2`.</span>
 
+<code>**class** [CoconutGetInfo](#coconutgetinfo)([Structure](common.md))</code><br>
 <code>**class** [CoconutGetParam](#coconutgetparam)([Structure](common.md))</code><br>
+<code>**class** [CoconutMeta](#coconutmeta)([Structure](common.md))</code><br>
+<code>**class** [CoconutViolation](#coconutviolation)([Structure](common.md))</code><br>
 <code>**class** [DataStoreChangeMetaCompareParam](#datastorechangemetacompareparam)([Structure](common.md))</code><br>
 <code>**class** [DataStoreChangeMetaParam](#datastorechangemetaparam)([Structure](common.md))</code><br>
 <code>**class** [DataStoreChangeMetaParamV1](#datastorechangemetaparamv1)([Structure](common.md))</code><br>
@@ -258,6 +261,12 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def search_object_light**(param: [DataStoreSearchParam](#datastoresearchparam)) -> [DataStoreSearchResult](#datastoresearchresult)</code><br>
 <span class="docs">Calls method `46` on the server.</span>
 
+<code>**async def coconut_register_meta**(meta: [CoconutMeta](#coconutmeta), url: str) -> None</code><br>
+<span class="docs">Calls method `47` on the server.</span>
+
+<code>**async def coconut_rate_post**(data_id: int) -> None</code><br>
+<span class="docs">Calls method `48` on the server.</span>
+
 <code>**async def coconut_get_object_infos**(param: [CoconutGetParam](#coconutgetparam)) -> None</code><br>
 <span class="docs">Calls method `49` on the server.</span>
 
@@ -466,8 +475,24 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def search_object_light**(client: [RMCClient](rmc.md#rmcclient), param: [DataStoreSearchParam](#datastoresearchparam)) -> [DataStoreSearchResult](#datastoresearchresult)</code><br>
 <span class="docs">Handler for method `46`. This method should be overridden by a subclass.</span>
 
+<code>**async def coconut_register_meta**(client: [RMCClient](rmc.md#rmcclient), meta: [CoconutMeta](#coconutmeta), url: str) -> None</code><br>
+<span class="docs">Handler for method `47`. This method should be overridden by a subclass.</span>
+
+<code>**async def coconut_rate_post**(client: [RMCClient](rmc.md#rmcclient), data_id: int) -> None</code><br>
+<span class="docs">Handler for method `48`. This method should be overridden by a subclass.</span>
+
 <code>**async def coconut_get_object_infos**(client: [RMCClient](rmc.md#rmcclient), param: [CoconutGetParam](#coconutgetparam)) -> None</code><br>
 <span class="docs">Handler for method `49`. This method should be overridden by a subclass.</span>
+
+## CoconutGetInfo
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CoconutGetInfo` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>info: [DataStoreReqGetInfo](#datastorereqgetinfo) = [DataStoreReqGetInfo](#datastorereqgetinfo)()</code><br>
+<code>meta: [CoconutMeta](#coconutmeta) = [CoconutMeta](#coconutmeta)()</code><br>
+</span><br>
 
 ## CoconutGetParam
 <code>**def _\_init__**()</code><br>
@@ -479,6 +504,33 @@ The following fields are defined in this class:<br>
 <code>get_type: int</code><br>
 <code>region: int</code><br>
 <code>festival_id: int</code><br>
+</span><br>
+
+## CoconutMeta
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CoconutMeta` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>data_id: int</code><br>
+<code>tweet_id: int</code><br>
+<code>region: int</code><br>
+<code>post_type: int</code><br>
+<code>theme_id: int</code><br>
+<code>festival_id: int</code><br>
+<code>language: str</code><br>
+<code>binary_data: bytes</code><br>
+</span><br>
+
+## CoconutViolation
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CoconutViolation` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>data_id: int</code><br>
+<code>category_code: str</code><br>
+<code>reason: str</code><br>
 </span><br>
 
 ## DataStoreChangeMetaCompareParam
