@@ -1,0 +1,6 @@
+struct CoconutGetParam {
+    list<uint64> unique_ids;
+    uint8 get_type;
+    uint8 region;
+    uint32 festival_id;
+}

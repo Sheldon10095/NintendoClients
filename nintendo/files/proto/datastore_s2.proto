@@ -1,0 +1,8 @@
+import datastore;
+import coconut;
+
+protocol DataStore_S2 : DataStore {
+    method(49) coconut_get_object_infos(CoconutGetParam param) {
+        
+    }
+}
