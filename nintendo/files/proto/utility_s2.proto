@@ -1,0 +1,16 @@
+import utility;
+
+
+struct UpdateCurrentUserParam {
+    UniqueIdInfo info;
+    uint8 region;
+}
+
+protocol Utility_S2 : Utility {
+    
+    method(9) acquire_tag_id(list<uint64> nex_unique_ids) {
+        uint64 p_tag_id;
+    }
+
+    method(10) update_current_user(UpdateCurrentUserParam param) {}
+}

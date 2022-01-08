@@ -1,0 +1,74 @@
+import ranking;
+
+
+struct FestivalResult {
+    uint32 festival_id;
+    uint32 num_participants;
+    list<uint32> team_participants;
+    list<uint32> team_scores;
+    datetime updated_time;
+}
+
+struct FestivalUploadScoreParam {
+    uint64 unique_id;
+    uint8 region;
+    uint32 festival_id;
+    uint8 team_id;
+    uint32 score;
+    uint32 battle_gathering_id;
+    uint32 battle_result;
+    qbuffer application_buffer;
+}
+
+struct FestivalUploadVoteParam {
+    uint32 festival_id;
+    uint8 theme_id;
+}
+
+
+struct LeaguePlayerDetail {
+    uint64 principal_id;
+    sint32 weapon_id;
+}
+
+struct LeaguePointInfo {
+    uint64 tag_id;
+    uint8 region_flag;
+    string league_id;
+    uint32 point;
+    map<uint64, LeaguePlayerDetail> tag_members;
+    qbuffer application_buffer;
+}
+
+struct LeagueResult {
+    LeaguePointInfo league_point_info;
+    uint8 status;
+    uint32 specific_rank;
+    uint8 rank_ratio;
+    uint32 tag_num;
+    uint32 match_count;
+}
+
+
+protocol Ranking_S2 : Ranking {
+
+    method(16) upload_league_point(LeaguePointInfo info) {}
+    method(17) get_league_result(string league_id, uint64 tag_id) {
+        LeagueResult result;
+    }
+
+    method(18) get_festival_result(uint32 festival_id) {
+        FestivalResult result;
+    }
+    method(19) upload_festival_vote(FestivalUploadVoteParam upload_param) {}
+    method(20) upload_festival_score(FestivalUploadScoreParam upload_param) {}
+    method(21) delete_festival(uint32 festival_id) {}
+
+
+    // Unknown
+    // method(22) upload_x_power(?)
+    // method(23) get_x_power_ranking(?) {?}
+    // method(24) upload_event_match_result(?)
+    // method(25) get_event_match_result(?) {?}
+    // method(26) acquire_event_match_right
+}
