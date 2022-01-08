@@ -207,6 +207,13 @@ protocol DataStore_S2 : DataStore {
 
     method(59) upload_fes_match_result_v2(CalicoFesStatsV2 stats) {}
 
+    // Unknown
+    // method(60) upload_x_match_result(?)
+    // method(61) upload_regular_match_result_v2(?)
+    // method(62) upload_gachi_match_result_v2(?)
+    // method(63) upload_league_match_result_v2(?)
+    // method(64) upload_fes_match_result_v3(?)
+    // method(65) upload_x_match_result_v2(?)
 
     // Play logs
     method(66) prepare_post_play_log(PlayLogPreparePostParam param) {
@@ -216,4 +223,8 @@ protocol DataStore_S2 : DataStore {
     method(67) prepare_get_play_log(PlayLogPrepareGetParam param) {
         DataStoreReqGetInfo get_request_info;
     }
+
+    // Unknown
+    // method(68) upload_fes_match_result_v4(?)
+    // method(69) upload_coop_result(?)
 }
