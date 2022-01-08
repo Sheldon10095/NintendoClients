@@ -32,14 +32,188 @@ struct CoconutViolation {
     string reason;
 }
 
+struct OrderedInfo {
+    sint32 gear_kind;
+    sint32 gear_id;
+    sint32 skill_id;
+    sint32 price;
+}
+
+struct PlayLogEntry {
+    pid user_id;
+    string player_name;
+    uint64 unknown;
+    map<string, variant> properties; // See property keys below
+
+    // Property Keys:
+    //  save, 
+    //  udemae
+}
+
+struct PlayLogPrepareGetParam {
+    uint64 unknown0;
+    datetime unknown1;
+    uint32 unknown2;
+}
+
+struct PlayLogPreparePostParam {
+    list<PlayLogEntry> entries;
+    datetime play_time;
+    uint32 stage_id;
+    uint32 unknown0;
+    map<string, variant> properties; // See property keys below
+
+    // Property Keys: 
+    //  app_version, 
+    //  game_mode, 
+    //  game_rule, 
+    //  replay_version, 
+    //  stage_id, 
+    //  stage_name
+}
+
+struct StageTimeAttackInfo {
+    map<sint32, StageTimeAttackWeapon> clear_weapons;
+}
+
+struct StageTimeAttackWeapon {
+    sint32 weapon_level;
+    sint32 clear_time;
+}
+
+struct TimeAttackInfo {
+    map<sint32, StageTimeAttackInfo> stage_infos;
+}
+
+
+
+
+
+// Calico Stuff
+
+struct CalicoPlayerResult {
+    CalicoPlayerSimple player_simple;
+    sint32 kill_count;
+    sint32 assist_count;
+    sint32 death_count;
+    sint32 special_count;
+    sint32 game_paint_point;
+    sint32 sort_score;
+}
+
+struct CalicoPlayerSimple {
+    pid pid;
+    string name;
+    uint8 player_type;
+    sint32 udemae;
+    sint32 player_rank;
+    sint32 star_rank;
+    sint32 fes_grade;
+    sint32 weapon_id;
+    sint32 head_id;
+    list<sint32> head_skill_ids;
+    sint32 clothes_ids;
+    list<sint32> clothes_skill_ids;
+    sint32 shoes_id;
+    list<sint32> shoes_skill_ids;
+}
+
+struct CalicoStatsBase {
+    uint32 game_mode;
+    sint32 rule;
+    uint8 result;
+    sint32 stage;
+    CalicoPlayerResult player_result;
+    list<CalicoPlayerResult> my_team_members;
+    list<CalicoPlayerResult> other_team_members;
+    sint32 weapon_paint_point;
+    datetime start_time;
+    uint64 battle_num;
+    sint32 player_rank;
+    sint32 star_rank;
+}
+
+struct CalicoRegularStats : CalicoStatsBase {
+    sint32 my_team_percentage;
+    sint32 other_team_percentage;
+    sint32 win_meter;
+}
+
+struct CailcoGachiStats : CalicoStatsBase {
+    sint32 elapsed_time;
+    sint8 my_team_count;
+    sint8 other_team_count;
+    sint32 udemae;
+    sint32 estimate_gachi_power;
+}
+
+struct CalicoLeagueStats : CailcoGachiStats {
+    string league_id;
+    uint64 tag_id;
+    sint32 league_point;
+    sint32 max_league_point;
+    sint32 my_estimate_league_point;
+    sint32 other_estimate_league_point;
+}
+
+struct CalicoFesStats : CalicoRegularStats {
+    uint32 fes_id;
+    uint8 theme_id;
+    sint32 fes_grade;
+    sint32 fes_point;
+    uint32 fes_power;
+    uint32 max_fes_power;
+    sint32 my_estimate_fes_power;
+    sint32 other_estimate_fes_power;
+}
+
+struct CalicoFesStatsV2 : CalicoFesStats {
+    uint8 other_theme_id;
+}
+
 
 
 // DataStore Stuff
 
 protocol DataStore_S2 : DataStore {
+    
     method(47) coconut_register_meta(CoconutMeta meta, string url) {}
     method(48) coconut_rate_post(uint64 data_id) {}
+    
     method(49) coconut_get_object_infos(CoconutGetParam param) {
-        // list<
+        list<CoconutGetInfo> p_infos;
+        list<result> p_results;
+    }
+    method(50) coconut_report_violation(CoconutViolation violation) {}
+
+    
+    // Match result stuff
+    method(51) upload_regular_match_result(CalicoRegularStats stats) {}
+    method(52) upload_gachi_match_result(CailcoGachiStats stats) {}
+    method(53) upload_league_match_result(CalicoLeagueStats stats) {}
+    method(54) upload_fes_match_result(CalicoFesStats stats) {}
+
+
+    // Gear Orders
+    method(55) get_ordered_gear() {
+        OrderedInfo info;
+    }
+    method(56) purchase_gear(OrderedInfo info) {}
+
+
+    method(57) upload_time_attack(TimeAttackInfo info) {}
+
+    method(58) coconut_register_meta_by_param(CoconutMeta meta, string sns_name, string post_id) {}
+
+    method(59) upload_fes_match_result_v2(CalicoFesStatsV2 stats) {}
+
+
+    // Play logs
+    method(66) prepare_post_play_log(PlayLogPreparePostParam param) {
+        DataStoreReqPostInfo post_request_info;
+    }
+
+    method(67) prepare_get_play_log(PlayLogPrepareGetParam param) {
+        DataStoreReqGetInfo get_request_info;
     }
 }

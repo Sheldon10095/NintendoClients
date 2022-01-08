@@ -1433,6 +1433,464 @@ class CoconutViolation(common.Structure):
 		stream.string(self.reason)
 
 
+class OrderedInfo(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.gear_kind = None
+		self.gear_id = None
+		self.skill_id = None
+		self.price = None
+	
+	def check_required(self, settings, version):
+		for field in ['gear_kind', 'gear_id', 'skill_id', 'price']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.gear_kind = stream.s32()
+		self.gear_id = stream.s32()
+		self.skill_id = stream.s32()
+		self.price = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.s32(self.gear_kind)
+		stream.s32(self.gear_id)
+		stream.s32(self.skill_id)
+		stream.s32(self.price)
+
+
+class PlayLogEntry(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.user_id = None
+		self.player_name = None
+		self.unknown = None
+		self.properties = None
+	
+	def check_required(self, settings, version):
+		for field in ['user_id', 'player_name', 'unknown', 'properties']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.user_id = stream.pid()
+		self.player_name = stream.string()
+		self.unknown = stream.u64()
+		self.properties = stream.map(stream.string, stream.variant)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.pid(self.user_id)
+		stream.string(self.player_name)
+		stream.u64(self.unknown)
+		stream.map(self.properties, stream.string, stream.variant)
+
+
+class PlayLogPrepareGetParam(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.unknown0 = None
+		self.unknown1 = None
+		self.unknown2 = None
+	
+	def check_required(self, settings, version):
+		for field in ['unknown0', 'unknown1', 'unknown2']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.unknown0 = stream.u64()
+		self.unknown1 = stream.datetime()
+		self.unknown2 = stream.u32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u64(self.unknown0)
+		stream.datetime(self.unknown1)
+		stream.u32(self.unknown2)
+
+
+class PlayLogPreparePostParam(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.entries = None
+		self.play_time = None
+		self.stage_id = None
+		self.unknown0 = None
+		self.properties = None
+	
+	def check_required(self, settings, version):
+		for field in ['entries', 'play_time', 'stage_id', 'unknown0', 'properties']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.entries = stream.list(PlayLogEntry)
+		self.play_time = stream.datetime()
+		self.stage_id = stream.u32()
+		self.unknown0 = stream.u32()
+		self.properties = stream.map(stream.string, stream.variant)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.list(self.entries, stream.add)
+		stream.datetime(self.play_time)
+		stream.u32(self.stage_id)
+		stream.u32(self.unknown0)
+		stream.map(self.properties, stream.string, stream.variant)
+
+
+class StageTimeAttackInfo(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.clear_weapons = None
+	
+	def check_required(self, settings, version):
+		for field in ['clear_weapons']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.clear_weapons = stream.map(stream.s32, StageTimeAttackWeapon)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.map(self.clear_weapons, stream.s32, stream.add)
+
+
+class StageTimeAttackWeapon(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.weapon_level = None
+		self.clear_time = None
+	
+	def check_required(self, settings, version):
+		for field in ['weapon_level', 'clear_time']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.weapon_level = stream.s32()
+		self.clear_time = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.s32(self.weapon_level)
+		stream.s32(self.clear_time)
+
+
+class TimeAttackInfo(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.stage_infos = None
+	
+	def check_required(self, settings, version):
+		for field in ['stage_infos']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.stage_infos = stream.map(stream.s32, StageTimeAttackInfo)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.map(self.stage_infos, stream.s32, stream.add)
+
+
+class CalicoPlayerResult(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.player_simple = CalicoPlayerSimple()
+		self.kill_count = None
+		self.assist_count = None
+		self.death_count = None
+		self.special_count = None
+		self.game_paint_point = None
+		self.sort_score = None
+	
+	def check_required(self, settings, version):
+		for field in ['kill_count', 'assist_count', 'death_count', 'special_count', 'game_paint_point', 'sort_score']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.player_simple = stream.extract(CalicoPlayerSimple)
+		self.kill_count = stream.s32()
+		self.assist_count = stream.s32()
+		self.death_count = stream.s32()
+		self.special_count = stream.s32()
+		self.game_paint_point = stream.s32()
+		self.sort_score = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.add(self.player_simple)
+		stream.s32(self.kill_count)
+		stream.s32(self.assist_count)
+		stream.s32(self.death_count)
+		stream.s32(self.special_count)
+		stream.s32(self.game_paint_point)
+		stream.s32(self.sort_score)
+
+
+class CalicoPlayerSimple(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.pid = None
+		self.name = None
+		self.player_type = None
+		self.udemae = None
+		self.player_rank = None
+		self.star_rank = None
+		self.fes_grade = None
+		self.weapon_id = None
+		self.head_id = None
+		self.head_skill_ids = None
+		self.clothes_ids = None
+		self.clothes_skill_ids = None
+		self.shoes_id = None
+		self.shoes_skill_ids = None
+	
+	def check_required(self, settings, version):
+		for field in ['pid', 'name', 'player_type', 'udemae', 'player_rank', 'star_rank', 'fes_grade', 'weapon_id', 'head_id', 'head_skill_ids', 'clothes_ids', 'clothes_skill_ids', 'shoes_id', 'shoes_skill_ids']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.pid = stream.pid()
+		self.name = stream.string()
+		self.player_type = stream.u8()
+		self.udemae = stream.s32()
+		self.player_rank = stream.s32()
+		self.star_rank = stream.s32()
+		self.fes_grade = stream.s32()
+		self.weapon_id = stream.s32()
+		self.head_id = stream.s32()
+		self.head_skill_ids = stream.list(stream.s32)
+		self.clothes_ids = stream.s32()
+		self.clothes_skill_ids = stream.list(stream.s32)
+		self.shoes_id = stream.s32()
+		self.shoes_skill_ids = stream.list(stream.s32)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.pid(self.pid)
+		stream.string(self.name)
+		stream.u8(self.player_type)
+		stream.s32(self.udemae)
+		stream.s32(self.player_rank)
+		stream.s32(self.star_rank)
+		stream.s32(self.fes_grade)
+		stream.s32(self.weapon_id)
+		stream.s32(self.head_id)
+		stream.list(self.head_skill_ids, stream.s32)
+		stream.s32(self.clothes_ids)
+		stream.list(self.clothes_skill_ids, stream.s32)
+		stream.s32(self.shoes_id)
+		stream.list(self.shoes_skill_ids, stream.s32)
+
+
+class CalicoStatsBase(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.game_mode = None
+		self.rule = None
+		self.result = None
+		self.stage = None
+		self.player_result = CalicoPlayerResult()
+		self.my_team_members = None
+		self.other_team_members = None
+		self.weapon_paint_point = None
+		self.start_time = None
+		self.battle_num = None
+		self.player_rank = None
+		self.star_rank = None
+	
+	def check_required(self, settings, version):
+		for field in ['game_mode', 'rule', 'result', 'stage', 'my_team_members', 'other_team_members', 'weapon_paint_point', 'start_time', 'battle_num', 'player_rank', 'star_rank']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.game_mode = stream.u32()
+		self.rule = stream.s32()
+		self.result = stream.u8()
+		self.stage = stream.s32()
+		self.player_result = stream.extract(CalicoPlayerResult)
+		self.my_team_members = stream.list(CalicoPlayerResult)
+		self.other_team_members = stream.list(CalicoPlayerResult)
+		self.weapon_paint_point = stream.s32()
+		self.start_time = stream.datetime()
+		self.battle_num = stream.u64()
+		self.player_rank = stream.s32()
+		self.star_rank = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u32(self.game_mode)
+		stream.s32(self.rule)
+		stream.u8(self.result)
+		stream.s32(self.stage)
+		stream.add(self.player_result)
+		stream.list(self.my_team_members, stream.add)
+		stream.list(self.other_team_members, stream.add)
+		stream.s32(self.weapon_paint_point)
+		stream.datetime(self.start_time)
+		stream.u64(self.battle_num)
+		stream.s32(self.player_rank)
+		stream.s32(self.star_rank)
+
+
+class CalicoRegularStats(CalicoStatsBase):
+	def __init__(self):
+		super().__init__()
+		self.my_team_percentage = None
+		self.other_team_percentage = None
+		self.win_meter = None
+	
+	def check_required(self, settings, version):
+		for field in ['my_team_percentage', 'other_team_percentage', 'win_meter']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.my_team_percentage = stream.s32()
+		self.other_team_percentage = stream.s32()
+		self.win_meter = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.s32(self.my_team_percentage)
+		stream.s32(self.other_team_percentage)
+		stream.s32(self.win_meter)
+common.DataHolder.register(CalicoRegularStats, "CalicoRegularStats")
+
+
+class CailcoGachiStats(CalicoStatsBase):
+	def __init__(self):
+		super().__init__()
+		self.elapsed_time = None
+		self.my_team_count = None
+		self.other_team_count = None
+		self.udemae = None
+		self.estimate_gachi_power = None
+	
+	def check_required(self, settings, version):
+		for field in ['elapsed_time', 'my_team_count', 'other_team_count', 'udemae', 'estimate_gachi_power']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.elapsed_time = stream.s32()
+		self.my_team_count = stream.s8()
+		self.other_team_count = stream.s8()
+		self.udemae = stream.s32()
+		self.estimate_gachi_power = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.s32(self.elapsed_time)
+		stream.s8(self.my_team_count)
+		stream.s8(self.other_team_count)
+		stream.s32(self.udemae)
+		stream.s32(self.estimate_gachi_power)
+common.DataHolder.register(CailcoGachiStats, "CailcoGachiStats")
+
+
+class CalicoLeagueStats(CailcoGachiStats):
+	def __init__(self):
+		super().__init__()
+		self.league_id = None
+		self.tag_id = None
+		self.league_point = None
+		self.max_league_point = None
+		self.my_estimate_league_point = None
+		self.other_estimate_league_point = None
+	
+	def check_required(self, settings, version):
+		for field in ['league_id', 'tag_id', 'league_point', 'max_league_point', 'my_estimate_league_point', 'other_estimate_league_point']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.league_id = stream.string()
+		self.tag_id = stream.u64()
+		self.league_point = stream.s32()
+		self.max_league_point = stream.s32()
+		self.my_estimate_league_point = stream.s32()
+		self.other_estimate_league_point = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.string(self.league_id)
+		stream.u64(self.tag_id)
+		stream.s32(self.league_point)
+		stream.s32(self.max_league_point)
+		stream.s32(self.my_estimate_league_point)
+		stream.s32(self.other_estimate_league_point)
+common.DataHolder.register(CalicoLeagueStats, "CalicoLeagueStats")
+
+
+class CalicoFesStats(CalicoRegularStats):
+	def __init__(self):
+		super().__init__()
+		self.fes_id = None
+		self.theme_id = None
+		self.fes_grade = None
+		self.fes_point = None
+		self.fes_power = None
+		self.max_fes_power = None
+		self.my_estimate_fes_power = None
+		self.other_estimate_fes_power = None
+	
+	def check_required(self, settings, version):
+		for field in ['fes_id', 'theme_id', 'fes_grade', 'fes_point', 'fes_power', 'max_fes_power', 'my_estimate_fes_power', 'other_estimate_fes_power']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.fes_id = stream.u32()
+		self.theme_id = stream.u8()
+		self.fes_grade = stream.s32()
+		self.fes_point = stream.s32()
+		self.fes_power = stream.u32()
+		self.max_fes_power = stream.u32()
+		self.my_estimate_fes_power = stream.s32()
+		self.other_estimate_fes_power = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u32(self.fes_id)
+		stream.u8(self.theme_id)
+		stream.s32(self.fes_grade)
+		stream.s32(self.fes_point)
+		stream.u32(self.fes_power)
+		stream.u32(self.max_fes_power)
+		stream.s32(self.my_estimate_fes_power)
+		stream.s32(self.other_estimate_fes_power)
+common.DataHolder.register(CalicoFesStats, "CalicoFesStats")
+
+
+class CalicoFesStatsV2(CalicoFesStats):
+	def __init__(self):
+		super().__init__()
+		self.other_theme_id = None
+	
+	def check_required(self, settings, version):
+		for field in ['other_theme_id']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.other_theme_id = stream.u8()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u8(self.other_theme_id)
+common.DataHolder.register(CalicoFesStatsV2, "CalicoFesStatsV2")
+
+
 class DataStoreProtocolS2:
 	METHOD_PREPARE_GET_OBJECT_V1 = 1
 	METHOD_PREPARE_POST_OBJECT_V1 = 2
@@ -1483,6 +1941,18 @@ class DataStoreProtocolS2:
 	METHOD_COCONUT_REGISTER_META = 47
 	METHOD_COCONUT_RATE_POST = 48
 	METHOD_COCONUT_GET_OBJECT_INFOS = 49
+	METHOD_COCONUT_REPORT_VIOLATION = 50
+	METHOD_UPLOAD_REGULAR_MATCH_RESULT = 51
+	METHOD_UPLOAD_GACHI_MATCH_RESULT = 52
+	METHOD_UPLOAD_LEAGUE_MATCH_RESULT = 53
+	METHOD_UPLOAD_FES_MATCH_RESULT = 54
+	METHOD_GET_ORDERED_GEAR = 55
+	METHOD_PURCHASE_GEAR = 56
+	METHOD_UPLOAD_TIME_ATTACK = 57
+	METHOD_COCONUT_REGISTER_META_BY_PARAM = 58
+	METHOD_UPLOAD_FES_MATCH_RESULT_V2 = 59
+	METHOD_PREPARE_POST_PLAY_LOG = 66
+	METHOD_PREPARE_GET_PLAY_LOG = 67
 	
 	PROTOCOL_ID = 0x73
 
@@ -2249,9 +2719,176 @@ class DataStoreClientS2(DataStoreProtocolS2):
 		
 		#--- response ---
 		stream = streams.StreamIn(data, self.settings)
+		obj = rmc.RMCResponse()
+		obj.p_infos = stream.list(CoconutGetInfo)
+		obj.p_results = stream.list(stream.result)
 		if not stream.eof():
 			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
 		logger.info("DataStoreClientS2.coconut_get_object_infos -> done")
+		return obj
+	
+	async def coconut_report_violation(self, violation):
+		logger.info("DataStoreClientS2.coconut_report_violation()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(violation)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_COCONUT_REPORT_VIOLATION, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.coconut_report_violation -> done")
+	
+	async def upload_regular_match_result(self, stats):
+		logger.info("DataStoreClientS2.upload_regular_match_result()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_REGULAR_MATCH_RESULT, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_regular_match_result -> done")
+	
+	async def upload_gachi_match_result(self, stats):
+		logger.info("DataStoreClientS2.upload_gachi_match_result()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_GACHI_MATCH_RESULT, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_gachi_match_result -> done")
+	
+	async def upload_league_match_result(self, stats):
+		logger.info("DataStoreClientS2.upload_league_match_result()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_LEAGUE_MATCH_RESULT, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_league_match_result -> done")
+	
+	async def upload_fes_match_result(self, stats):
+		logger.info("DataStoreClientS2.upload_fes_match_result()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_FES_MATCH_RESULT, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_fes_match_result -> done")
+	
+	async def get_ordered_gear(self):
+		logger.info("DataStoreClientS2.get_ordered_gear()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_GET_ORDERED_GEAR, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		info = stream.extract(OrderedInfo)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.get_ordered_gear -> done")
+		return info
+	
+	async def purchase_gear(self, info):
+		logger.info("DataStoreClientS2.purchase_gear()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(info)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_PURCHASE_GEAR, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.purchase_gear -> done")
+	
+	async def upload_time_attack(self, info):
+		logger.info("DataStoreClientS2.upload_time_attack()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(info)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_TIME_ATTACK, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_time_attack -> done")
+	
+	async def coconut_register_meta_by_param(self, meta, sns_name, post_id):
+		logger.info("DataStoreClientS2.coconut_register_meta_by_param()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(meta)
+		stream.string(sns_name)
+		stream.string(post_id)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_COCONUT_REGISTER_META_BY_PARAM, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.coconut_register_meta_by_param -> done")
+	
+	async def upload_fes_match_result_v2(self, stats):
+		logger.info("DataStoreClientS2.upload_fes_match_result_v2()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_FES_MATCH_RESULT_V2, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_fes_match_result_v2 -> done")
+	
+	async def prepare_post_play_log(self, param):
+		logger.info("DataStoreClientS2.prepare_post_play_log()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(param)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_PREPARE_POST_PLAY_LOG, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		post_request_info = stream.extract(DataStoreReqPostInfo)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.prepare_post_play_log -> done")
+		return post_request_info
+	
+	async def prepare_get_play_log(self, param):
+		logger.info("DataStoreClientS2.prepare_get_play_log()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(param)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_PREPARE_GET_PLAY_LOG, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		get_request_info = stream.extract(DataStoreReqGetInfo)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.prepare_get_play_log -> done")
+		return get_request_info
 
 
 class DataStoreServerS2(DataStoreProtocolS2):
@@ -2306,6 +2943,18 @@ class DataStoreServerS2(DataStoreProtocolS2):
 			self.METHOD_COCONUT_REGISTER_META: self.handle_coconut_register_meta,
 			self.METHOD_COCONUT_RATE_POST: self.handle_coconut_rate_post,
 			self.METHOD_COCONUT_GET_OBJECT_INFOS: self.handle_coconut_get_object_infos,
+			self.METHOD_COCONUT_REPORT_VIOLATION: self.handle_coconut_report_violation,
+			self.METHOD_UPLOAD_REGULAR_MATCH_RESULT: self.handle_upload_regular_match_result,
+			self.METHOD_UPLOAD_GACHI_MATCH_RESULT: self.handle_upload_gachi_match_result,
+			self.METHOD_UPLOAD_LEAGUE_MATCH_RESULT: self.handle_upload_league_match_result,
+			self.METHOD_UPLOAD_FES_MATCH_RESULT: self.handle_upload_fes_match_result,
+			self.METHOD_GET_ORDERED_GEAR: self.handle_get_ordered_gear,
+			self.METHOD_PURCHASE_GEAR: self.handle_purchase_gear,
+			self.METHOD_UPLOAD_TIME_ATTACK: self.handle_upload_time_attack,
+			self.METHOD_COCONUT_REGISTER_META_BY_PARAM: self.handle_coconut_register_meta_by_param,
+			self.METHOD_UPLOAD_FES_MATCH_RESULT_V2: self.handle_upload_fes_match_result_v2,
+			self.METHOD_PREPARE_POST_PLAY_LOG: self.handle_prepare_post_play_log,
+			self.METHOD_PREPARE_GET_PLAY_LOG: self.handle_prepare_get_play_log,
 		}
 	
 	async def logout(self, client):
@@ -2860,7 +3509,104 @@ class DataStoreServerS2(DataStoreProtocolS2):
 		logger.info("DataStoreServerS2.coconut_get_object_infos()")
 		#--- request ---
 		param = input.extract(CoconutGetParam)
-		await self.coconut_get_object_infos(client, param)
+		response = await self.coconut_get_object_infos(client, param)
+		
+		#--- response ---
+		if not isinstance(response, rmc.RMCResponse):
+			raise RuntimeError("Expected RMCResponse, got %s" %response.__class__.__name__)
+		for field in ['p_infos', 'p_results']:
+			if not hasattr(response, field):
+				raise RuntimeError("Missing field in RMCResponse: %s" %field)
+		output.list(response.p_infos, output.add)
+		output.list(response.p_results, output.result)
+	
+	async def handle_coconut_report_violation(self, client, input, output):
+		logger.info("DataStoreServerS2.coconut_report_violation()")
+		#--- request ---
+		violation = input.extract(CoconutViolation)
+		await self.coconut_report_violation(client, violation)
+	
+	async def handle_upload_regular_match_result(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_regular_match_result()")
+		#--- request ---
+		stats = input.extract(CalicoRegularStats)
+		await self.upload_regular_match_result(client, stats)
+	
+	async def handle_upload_gachi_match_result(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_gachi_match_result()")
+		#--- request ---
+		stats = input.extract(CailcoGachiStats)
+		await self.upload_gachi_match_result(client, stats)
+	
+	async def handle_upload_league_match_result(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_league_match_result()")
+		#--- request ---
+		stats = input.extract(CalicoLeagueStats)
+		await self.upload_league_match_result(client, stats)
+	
+	async def handle_upload_fes_match_result(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_fes_match_result()")
+		#--- request ---
+		stats = input.extract(CalicoFesStats)
+		await self.upload_fes_match_result(client, stats)
+	
+	async def handle_get_ordered_gear(self, client, input, output):
+		logger.info("DataStoreServerS2.get_ordered_gear()")
+		#--- request ---
+		response = await self.get_ordered_gear(client)
+		
+		#--- response ---
+		if not isinstance(response, OrderedInfo):
+			raise RuntimeError("Expected OrderedInfo, got %s" %response.__class__.__name__)
+		output.add(response)
+	
+	async def handle_purchase_gear(self, client, input, output):
+		logger.info("DataStoreServerS2.purchase_gear()")
+		#--- request ---
+		info = input.extract(OrderedInfo)
+		await self.purchase_gear(client, info)
+	
+	async def handle_upload_time_attack(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_time_attack()")
+		#--- request ---
+		info = input.extract(TimeAttackInfo)
+		await self.upload_time_attack(client, info)
+	
+	async def handle_coconut_register_meta_by_param(self, client, input, output):
+		logger.info("DataStoreServerS2.coconut_register_meta_by_param()")
+		#--- request ---
+		meta = input.extract(CoconutMeta)
+		sns_name = input.string()
+		post_id = input.string()
+		await self.coconut_register_meta_by_param(client, meta, sns_name, post_id)
+	
+	async def handle_upload_fes_match_result_v2(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_fes_match_result_v2()")
+		#--- request ---
+		stats = input.extract(CalicoFesStatsV2)
+		await self.upload_fes_match_result_v2(client, stats)
+	
+	async def handle_prepare_post_play_log(self, client, input, output):
+		logger.info("DataStoreServerS2.prepare_post_play_log()")
+		#--- request ---
+		param = input.extract(PlayLogPreparePostParam)
+		response = await self.prepare_post_play_log(client, param)
+		
+		#--- response ---
+		if not isinstance(response, DataStoreReqPostInfo):
+			raise RuntimeError("Expected DataStoreReqPostInfo, got %s" %response.__class__.__name__)
+		output.add(response)
+	
+	async def handle_prepare_get_play_log(self, client, input, output):
+		logger.info("DataStoreServerS2.prepare_get_play_log()")
+		#--- request ---
+		param = input.extract(PlayLogPrepareGetParam)
+		response = await self.prepare_get_play_log(client, param)
+		
+		#--- response ---
+		if not isinstance(response, DataStoreReqGetInfo):
+			raise RuntimeError("Expected DataStoreReqGetInfo, got %s" %response.__class__.__name__)
+		output.add(response)
 	
 	async def prepare_get_object_v1(self, *args):
 		logger.warning("DataStoreServerS2.prepare_get_object_v1 not implemented")
@@ -3056,5 +3802,53 @@ class DataStoreServerS2(DataStoreProtocolS2):
 	
 	async def coconut_get_object_infos(self, *args):
 		logger.warning("DataStoreServerS2.coconut_get_object_infos not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def coconut_report_violation(self, *args):
+		logger.warning("DataStoreServerS2.coconut_report_violation not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_regular_match_result(self, *args):
+		logger.warning("DataStoreServerS2.upload_regular_match_result not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_gachi_match_result(self, *args):
+		logger.warning("DataStoreServerS2.upload_gachi_match_result not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_league_match_result(self, *args):
+		logger.warning("DataStoreServerS2.upload_league_match_result not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_fes_match_result(self, *args):
+		logger.warning("DataStoreServerS2.upload_fes_match_result not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def get_ordered_gear(self, *args):
+		logger.warning("DataStoreServerS2.get_ordered_gear not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def purchase_gear(self, *args):
+		logger.warning("DataStoreServerS2.purchase_gear not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_time_attack(self, *args):
+		logger.warning("DataStoreServerS2.upload_time_attack not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def coconut_register_meta_by_param(self, *args):
+		logger.warning("DataStoreServerS2.coconut_register_meta_by_param not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_fes_match_result_v2(self, *args):
+		logger.warning("DataStoreServerS2.upload_fes_match_result_v2 not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def prepare_post_play_log(self, *args):
+		logger.warning("DataStoreServerS2.prepare_post_play_log not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def prepare_get_play_log(self, *args):
+		logger.warning("DataStoreServerS2.prepare_get_play_log not implemented")
 		raise common.RMCError("Core::NotImplemented")
 

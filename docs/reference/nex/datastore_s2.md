@@ -9,6 +9,14 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**class** [DataStoreServerS2](#datastoreservers2)</code><br>
 <span class="docs">The server for the `DataStoreProtocolS2`.</span>
 
+<code>**class** [CailcoGachiStats](#cailcogachistats)([CalicoStatsBase](#calicostatsbase))</code><br>
+<code>**class** [CalicoFesStats](#calicofesstats)([CalicoRegularStats](#calicoregularstats))</code><br>
+<code>**class** [CalicoFesStatsV2](#calicofesstatsv2)([CalicoFesStats](#calicofesstats))</code><br>
+<code>**class** [CalicoLeagueStats](#calicoleaguestats)([CailcoGachiStats](#cailcogachistats))</code><br>
+<code>**class** [CalicoPlayerResult](#calicoplayerresult)([Structure](common.md))</code><br>
+<code>**class** [CalicoPlayerSimple](#calicoplayersimple)([Structure](common.md))</code><br>
+<code>**class** [CalicoRegularStats](#calicoregularstats)([CalicoStatsBase](#calicostatsbase))</code><br>
+<code>**class** [CalicoStatsBase](#calicostatsbase)([Structure](common.md))</code><br>
 <code>**class** [CoconutGetInfo](#coconutgetinfo)([Structure](common.md))</code><br>
 <code>**class** [CoconutGetParam](#coconutgetparam)([Structure](common.md))</code><br>
 <code>**class** [CoconutMeta](#coconutmeta)([Structure](common.md))</code><br>
@@ -58,6 +66,13 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**class** [DataStoreSpecificMetaInfo](#datastorespecificmetainfo)([Structure](common.md))</code><br>
 <code>**class** [DataStoreSpecificMetaInfoV1](#datastorespecificmetainfov1)([Structure](common.md))</code><br>
 <code>**class** [DataStoreTouchObjectParam](#datastoretouchobjectparam)([Structure](common.md))</code><br>
+<code>**class** [OrderedInfo](#orderedinfo)([Structure](common.md))</code><br>
+<code>**class** [PlayLogEntry](#playlogentry)([Structure](common.md))</code><br>
+<code>**class** [PlayLogPrepareGetParam](#playlogpreparegetparam)([Structure](common.md))</code><br>
+<code>**class** [PlayLogPreparePostParam](#playlogpreparepostparam)([Structure](common.md))</code><br>
+<code>**class** [StageTimeAttackInfo](#stagetimeattackinfo)([Structure](common.md))</code><br>
+<code>**class** [StageTimeAttackWeapon](#stagetimeattackweapon)([Structure](common.md))</code><br>
+<code>**class** [TimeAttackInfo](#timeattackinfo)([Structure](common.md))</code><br>
 
 ## DataStoreClientS2
 <code>**def _\_init__**(client: [RMCClient](rmc.md#rmcclient) / [HppClient](hpp.md#hppclient))</code><br>
@@ -267,8 +282,49 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def coconut_rate_post**(data_id: int) -> None</code><br>
 <span class="docs">Calls method `48` on the server.</span>
 
-<code>**async def coconut_get_object_infos**(param: [CoconutGetParam](#coconutgetparam)) -> None</code><br>
-<span class="docs">Calls method `49` on the server.</span>
+<code>**async def coconut_get_object_infos**(param: [CoconutGetParam](#coconutgetparam)) -> [RMCResponse](common.md)</code><br>
+<span class="docs">Calls method `49` on the server. The RMC response has the following attributes:<br>
+<span class="docs">
+<code>p_infos: list[[CoconutGetInfo](#coconutgetinfo)]</code><br>
+<code>p_results: list[[Result](common.md#result)]</code><br>
+</span>
+</span>
+
+<code>**async def coconut_report_violation**(violation: [CoconutViolation](#coconutviolation)) -> None</code><br>
+<span class="docs">Calls method `50` on the server.</span>
+
+<code>**async def upload_regular_match_result**(stats: [CalicoRegularStats](#calicoregularstats)) -> None</code><br>
+<span class="docs">Calls method `51` on the server.</span>
+
+<code>**async def upload_gachi_match_result**(stats: [CailcoGachiStats](#cailcogachistats)) -> None</code><br>
+<span class="docs">Calls method `52` on the server.</span>
+
+<code>**async def upload_league_match_result**(stats: [CalicoLeagueStats](#calicoleaguestats)) -> None</code><br>
+<span class="docs">Calls method `53` on the server.</span>
+
+<code>**async def upload_fes_match_result**(stats: [CalicoFesStats](#calicofesstats)) -> None</code><br>
+<span class="docs">Calls method `54` on the server.</span>
+
+<code>**async def get_ordered_gear**() -> [OrderedInfo](#orderedinfo)</code><br>
+<span class="docs">Calls method `55` on the server.</span>
+
+<code>**async def purchase_gear**(info: [OrderedInfo](#orderedinfo)) -> None</code><br>
+<span class="docs">Calls method `56` on the server.</span>
+
+<code>**async def upload_time_attack**(info: [TimeAttackInfo](#timeattackinfo)) -> None</code><br>
+<span class="docs">Calls method `57` on the server.</span>
+
+<code>**async def coconut_register_meta_by_param**(meta: [CoconutMeta](#coconutmeta), sns_name: str, post_id: str) -> None</code><br>
+<span class="docs">Calls method `58` on the server.</span>
+
+<code>**async def upload_fes_match_result_v2**(stats: [CalicoFesStatsV2](#calicofesstatsv2)) -> None</code><br>
+<span class="docs">Calls method `59` on the server.</span>
+
+<code>**async def prepare_post_play_log**(param: [PlayLogPreparePostParam](#playlogpreparepostparam)) -> [DataStoreReqPostInfo](#datastorereqpostinfo)</code><br>
+<span class="docs">Calls method `66` on the server.</span>
+
+<code>**async def prepare_get_play_log**(param: [PlayLogPrepareGetParam](#playlogpreparegetparam)) -> [DataStoreReqGetInfo](#datastorereqgetinfo)</code><br>
+<span class="docs">Calls method `67` on the server.</span>
 
 ## DataStoreServerS2
 <code>**def _\_init__**()</code><br>
@@ -481,8 +537,169 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def coconut_rate_post**(client: [RMCClient](rmc.md#rmcclient), data_id: int) -> None</code><br>
 <span class="docs">Handler for method `48`. This method should be overridden by a subclass.</span>
 
-<code>**async def coconut_get_object_infos**(client: [RMCClient](rmc.md#rmcclient), param: [CoconutGetParam](#coconutgetparam)) -> None</code><br>
-<span class="docs">Handler for method `49`. This method should be overridden by a subclass.</span>
+<code>**async def coconut_get_object_infos**(client: [RMCClient](rmc.md#rmcclient), param: [CoconutGetParam](#coconutgetparam)) -> [RMCResponse](common.md)</code><br>
+<span class="docs">Handler for method `49`. This method should be overridden by a subclass. The RMC response must have the following attributes:<br>
+<span class="docs">
+<code>p_infos: list[[CoconutGetInfo](#coconutgetinfo)]</code><br>
+<code>p_results: list[[Result](common.md#result)]</code><br>
+</span>
+</span>
+
+<code>**async def coconut_report_violation**(client: [RMCClient](rmc.md#rmcclient), violation: [CoconutViolation](#coconutviolation)) -> None</code><br>
+<span class="docs">Handler for method `50`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_regular_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoRegularStats](#calicoregularstats)) -> None</code><br>
+<span class="docs">Handler for method `51`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_gachi_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CailcoGachiStats](#cailcogachistats)) -> None</code><br>
+<span class="docs">Handler for method `52`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_league_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoLeagueStats](#calicoleaguestats)) -> None</code><br>
+<span class="docs">Handler for method `53`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_fes_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoFesStats](#calicofesstats)) -> None</code><br>
+<span class="docs">Handler for method `54`. This method should be overridden by a subclass.</span>
+
+<code>**async def get_ordered_gear**(client: [RMCClient](rmc.md#rmcclient)) -> [OrderedInfo](#orderedinfo)</code><br>
+<span class="docs">Handler for method `55`. This method should be overridden by a subclass.</span>
+
+<code>**async def purchase_gear**(client: [RMCClient](rmc.md#rmcclient), info: [OrderedInfo](#orderedinfo)) -> None</code><br>
+<span class="docs">Handler for method `56`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_time_attack**(client: [RMCClient](rmc.md#rmcclient), info: [TimeAttackInfo](#timeattackinfo)) -> None</code><br>
+<span class="docs">Handler for method `57`. This method should be overridden by a subclass.</span>
+
+<code>**async def coconut_register_meta_by_param**(client: [RMCClient](rmc.md#rmcclient), meta: [CoconutMeta](#coconutmeta), sns_name: str, post_id: str) -> None</code><br>
+<span class="docs">Handler for method `58`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_fes_match_result_v2**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoFesStatsV2](#calicofesstatsv2)) -> None</code><br>
+<span class="docs">Handler for method `59`. This method should be overridden by a subclass.</span>
+
+<code>**async def prepare_post_play_log**(client: [RMCClient](rmc.md#rmcclient), param: [PlayLogPreparePostParam](#playlogpreparepostparam)) -> [DataStoreReqPostInfo](#datastorereqpostinfo)</code><br>
+<span class="docs">Handler for method `66`. This method should be overridden by a subclass.</span>
+
+<code>**async def prepare_get_play_log**(client: [RMCClient](rmc.md#rmcclient), param: [PlayLogPrepareGetParam](#playlogpreparegetparam)) -> [DataStoreReqGetInfo](#datastorereqgetinfo)</code><br>
+<span class="docs">Handler for method `67`. This method should be overridden by a subclass.</span>
+
+## CailcoGachiStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CailcoGachiStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>elapsed_time: int</code><br>
+<code>my_team_count: int</code><br>
+<code>other_team_count: int</code><br>
+<code>udemae: int</code><br>
+<code>estimate_gachi_power: int</code><br>
+</span><br>
+
+## CalicoFesStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoFesStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>fes_id: int</code><br>
+<code>theme_id: int</code><br>
+<code>fes_grade: int</code><br>
+<code>fes_point: int</code><br>
+<code>fes_power: int</code><br>
+<code>max_fes_power: int</code><br>
+<code>my_estimate_fes_power: int</code><br>
+<code>other_estimate_fes_power: int</code><br>
+</span><br>
+
+## CalicoFesStatsV2
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoFesStatsV2` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>other_theme_id: int</code><br>
+</span><br>
+
+## CalicoLeagueStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoLeagueStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>league_id: str</code><br>
+<code>tag_id: int</code><br>
+<code>league_point: int</code><br>
+<code>max_league_point: int</code><br>
+<code>my_estimate_league_point: int</code><br>
+<code>other_estimate_league_point: int</code><br>
+</span><br>
+
+## CalicoPlayerResult
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoPlayerResult` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>player_simple: [CalicoPlayerSimple](#calicoplayersimple) = [CalicoPlayerSimple](#calicoplayersimple)()</code><br>
+<code>kill_count: int</code><br>
+<code>assist_count: int</code><br>
+<code>death_count: int</code><br>
+<code>special_count: int</code><br>
+<code>game_paint_point: int</code><br>
+<code>sort_score: int</code><br>
+</span><br>
+
+## CalicoPlayerSimple
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoPlayerSimple` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>pid: int</code><br>
+<code>name: str</code><br>
+<code>player_type: int</code><br>
+<code>udemae: int</code><br>
+<code>player_rank: int</code><br>
+<code>star_rank: int</code><br>
+<code>fes_grade: int</code><br>
+<code>weapon_id: int</code><br>
+<code>head_id: int</code><br>
+<code>head_skill_ids: list[int]</code><br>
+<code>clothes_ids: int</code><br>
+<code>clothes_skill_ids: list[int]</code><br>
+<code>shoes_id: int</code><br>
+<code>shoes_skill_ids: list[int]</code><br>
+</span><br>
+
+## CalicoRegularStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoRegularStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>my_team_percentage: int</code><br>
+<code>other_team_percentage: int</code><br>
+<code>win_meter: int</code><br>
+</span><br>
+
+## CalicoStatsBase
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoStatsBase` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>game_mode: int</code><br>
+<code>rule: int</code><br>
+<code>result: int</code><br>
+<code>stage: int</code><br>
+<code>player_result: [CalicoPlayerResult](#calicoplayerresult) = [CalicoPlayerResult](#calicoplayerresult)()</code><br>
+<code>my_team_members: list[[CalicoPlayerResult](#calicoplayerresult)]</code><br>
+<code>other_team_members: list[[CalicoPlayerResult](#calicoplayerresult)]</code><br>
+<code>weapon_paint_point: int</code><br>
+<code>start_time: [DateTime](common.md#datetime)</code><br>
+<code>battle_num: int</code><br>
+<code>player_rank: int</code><br>
+<code>star_rank: int</code><br>
+</span><br>
 
 ## CoconutGetInfo
 <code>**def _\_init__**()</code><br>
@@ -1113,5 +1330,81 @@ The following fields are defined in this class:<br>
 <code>data_id: int</code><br>
 <code>lock_id: int</code><br>
 <code>access_password: int</code><br>
+</span><br>
+
+## OrderedInfo
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `OrderedInfo` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>gear_kind: int</code><br>
+<code>gear_id: int</code><br>
+<code>skill_id: int</code><br>
+<code>price: int</code><br>
+</span><br>
+
+## PlayLogEntry
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `PlayLogEntry` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>user_id: int</code><br>
+<code>player_name: str</code><br>
+<code>unknown: int</code><br>
+<code>properties: dict[str, object]</code><br>
+</span><br>
+
+## PlayLogPrepareGetParam
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `PlayLogPrepareGetParam` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>unknown0: int</code><br>
+<code>unknown1: [DateTime](common.md#datetime)</code><br>
+<code>unknown2: int</code><br>
+</span><br>
+
+## PlayLogPreparePostParam
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `PlayLogPreparePostParam` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>entries: list[[PlayLogEntry](#playlogentry)]</code><br>
+<code>play_time: [DateTime](common.md#datetime)</code><br>
+<code>stage_id: int</code><br>
+<code>unknown0: int</code><br>
+<code>properties: dict[str, object]</code><br>
+</span><br>
+
+## StageTimeAttackInfo
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `StageTimeAttackInfo` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>clear_weapons: dict[int, [StageTimeAttackWeapon](#stagetimeattackweapon)]</code><br>
+</span><br>
+
+## StageTimeAttackWeapon
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `StageTimeAttackWeapon` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>weapon_level: int</code><br>
+<code>clear_time: int</code><br>
+</span><br>
+
+## TimeAttackInfo
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `TimeAttackInfo` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>stage_infos: dict[int, [StageTimeAttackInfo](#stagetimeattackinfo)]</code><br>
 </span><br>
 
