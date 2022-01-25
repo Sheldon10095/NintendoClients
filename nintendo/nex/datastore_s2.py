@@ -1767,7 +1767,7 @@ class CalicoRegularStats(CalicoStatsBase):
 common.DataHolder.register(CalicoRegularStats, "CalicoRegularStats")
 
 
-class CailcoGachiStats(CalicoStatsBase):
+class CalicoGachiStats(CalicoStatsBase):
 	def __init__(self):
 		super().__init__()
 		self.elapsed_time = None
@@ -1795,10 +1795,10 @@ class CailcoGachiStats(CalicoStatsBase):
 		stream.s8(self.other_team_count)
 		stream.s32(self.udemae)
 		stream.s32(self.estimate_gachi_power)
-common.DataHolder.register(CailcoGachiStats, "CailcoGachiStats")
+common.DataHolder.register(CalicoGachiStats, "CalicoGachiStats")
 
 
-class CalicoLeagueStats(CailcoGachiStats):
+class CalicoLeagueStats(CalicoGachiStats):
 	def __init__(self):
 		super().__init__()
 		self.league_id = None
@@ -1891,6 +1891,34 @@ class CalicoFesStatsV2(CalicoFesStats):
 common.DataHolder.register(CalicoFesStatsV2, "CalicoFesStatsV2")
 
 
+class CalicoXStats(CalicoGachiStats):
+	def __init__(self):
+		super().__init__()
+		self.crown_players = None
+		self.estimate_x_power = None
+		self.x_power = None
+		self.rank = None
+	
+	def check_required(self, settings, version):
+		for field in ['crown_players', 'estimate_x_power', 'x_power', 'rank']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.crown_players = stream.list(stream.u64)
+		self.estimate_x_power = stream.s32()
+		self.x_power = stream.s32()
+		self.rank = stream.s32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.list(self.crown_players, stream.u64)
+		stream.s32(self.estimate_x_power)
+		stream.s32(self.x_power)
+		stream.s32(self.rank)
+common.DataHolder.register(CalicoXStats, "CalicoXStats")
+
+
 class DataStoreProtocolS2:
 	METHOD_PREPARE_GET_OBJECT_V1 = 1
 	METHOD_PREPARE_POST_OBJECT_V1 = 2
@@ -1951,6 +1979,7 @@ class DataStoreProtocolS2:
 	METHOD_UPLOAD_TIME_ATTACK = 57
 	METHOD_COCONUT_REGISTER_META_BY_PARAM = 58
 	METHOD_UPLOAD_FES_MATCH_RESULT_V2 = 59
+	METHOD_UPLOAD_X_MATCH_RESULT = 60
 	METHOD_PREPARE_POST_PLAY_LOG = 66
 	METHOD_PREPARE_GET_PLAY_LOG = 67
 	
@@ -2860,6 +2889,19 @@ class DataStoreClientS2(DataStoreProtocolS2):
 			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
 		logger.info("DataStoreClientS2.upload_fes_match_result_v2 -> done")
 	
+	async def upload_x_match_result(self, stats):
+		logger.info("DataStoreClientS2.upload_x_match_result()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(stats)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_X_MATCH_RESULT, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("DataStoreClientS2.upload_x_match_result -> done")
+	
 	async def prepare_post_play_log(self, param):
 		logger.info("DataStoreClientS2.prepare_post_play_log()")
 		#--- request ---
@@ -2953,6 +2995,7 @@ class DataStoreServerS2(DataStoreProtocolS2):
 			self.METHOD_UPLOAD_TIME_ATTACK: self.handle_upload_time_attack,
 			self.METHOD_COCONUT_REGISTER_META_BY_PARAM: self.handle_coconut_register_meta_by_param,
 			self.METHOD_UPLOAD_FES_MATCH_RESULT_V2: self.handle_upload_fes_match_result_v2,
+			self.METHOD_UPLOAD_X_MATCH_RESULT: self.handle_upload_x_match_result,
 			self.METHOD_PREPARE_POST_PLAY_LOG: self.handle_prepare_post_play_log,
 			self.METHOD_PREPARE_GET_PLAY_LOG: self.handle_prepare_get_play_log,
 		}
@@ -3535,7 +3578,7 @@ class DataStoreServerS2(DataStoreProtocolS2):
 	async def handle_upload_gachi_match_result(self, client, input, output):
 		logger.info("DataStoreServerS2.upload_gachi_match_result()")
 		#--- request ---
-		stats = input.extract(CailcoGachiStats)
+		stats = input.extract(CalicoGachiStats)
 		await self.upload_gachi_match_result(client, stats)
 	
 	async def handle_upload_league_match_result(self, client, input, output):
@@ -3585,6 +3628,12 @@ class DataStoreServerS2(DataStoreProtocolS2):
 		#--- request ---
 		stats = input.extract(CalicoFesStatsV2)
 		await self.upload_fes_match_result_v2(client, stats)
+	
+	async def handle_upload_x_match_result(self, client, input, output):
+		logger.info("DataStoreServerS2.upload_x_match_result()")
+		#--- request ---
+		stats = input.extract(CalicoXStats)
+		await self.upload_x_match_result(client, stats)
 	
 	async def handle_prepare_post_play_log(self, client, input, output):
 		logger.info("DataStoreServerS2.prepare_post_play_log()")
@@ -3842,6 +3891,10 @@ class DataStoreServerS2(DataStoreProtocolS2):
 	
 	async def upload_fes_match_result_v2(self, *args):
 		logger.warning("DataStoreServerS2.upload_fes_match_result_v2 not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_x_match_result(self, *args):
+		logger.warning("DataStoreServerS2.upload_x_match_result not implemented")
 		raise common.RMCError("Core::NotImplemented")
 	
 	async def prepare_post_play_log(self, *args):

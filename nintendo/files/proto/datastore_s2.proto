@@ -139,7 +139,7 @@ struct CalicoRegularStats : CalicoStatsBase {
     sint32 win_meter;
 }
 
-struct CailcoGachiStats : CalicoStatsBase {
+struct CalicoGachiStats : CalicoStatsBase {
     sint32 elapsed_time;
     sint8 my_team_count;
     sint8 other_team_count;
@@ -147,7 +147,7 @@ struct CailcoGachiStats : CalicoStatsBase {
     sint32 estimate_gachi_power;
 }
 
-struct CalicoLeagueStats : CailcoGachiStats {
+struct CalicoLeagueStats : CalicoGachiStats {
     string league_id;
     uint64 tag_id;
     sint32 league_point;
@@ -171,6 +171,12 @@ struct CalicoFesStatsV2 : CalicoFesStats {
     uint8 other_theme_id;
 }
 
+struct CalicoXStats : CalicoGachiStats {
+    list<uint64> crown_players;
+    sint32 estimate_x_power;
+    sint32 x_power;
+    sint32 rank;
+}
 
 
 // DataStore Stuff
@@ -189,7 +195,7 @@ protocol DataStore_S2 : DataStore {
     
     // Match result stuff
     method(51) upload_regular_match_result(CalicoRegularStats stats) {}
-    method(52) upload_gachi_match_result(CailcoGachiStats stats) {}
+    method(52) upload_gachi_match_result(CalicoGachiStats stats) {}
     method(53) upload_league_match_result(CalicoLeagueStats stats) {}
     method(54) upload_fes_match_result(CalicoFesStats stats) {}
 
@@ -206,14 +212,14 @@ protocol DataStore_S2 : DataStore {
     method(58) coconut_register_meta_by_param(CoconutMeta meta, string sns_name, string post_id) {}
 
     method(59) upload_fes_match_result_v2(CalicoFesStatsV2 stats) {}
+    method(60) upload_x_match_result(CalicoXStats stats) {}
 
     // Unknown
-    // method(60) upload_x_match_result(?)
-    // method(61) upload_regular_match_result_v2(?)
-    // method(62) upload_gachi_match_result_v2(?)
-    // method(63) upload_league_match_result_v2(?)
-    // method(64) upload_fes_match_result_v3(?)
-    // method(65) upload_x_match_result_v2(?)
+    // method(61) upload_regular_match_result_v2(?) {}
+    // method(62) upload_gachi_match_result_v2(?) {}
+    // method(63) upload_league_match_result_v2(?) {}
+    // method(64) upload_fes_match_result_v3(?) {}
+    // method(65) upload_x_match_result_v2(?) {}
 
     // Play logs
     method(66) prepare_post_play_log(PlayLogPreparePostParam param) {

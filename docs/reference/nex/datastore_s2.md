@@ -9,14 +9,15 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**class** [DataStoreServerS2](#datastoreservers2)</code><br>
 <span class="docs">The server for the `DataStoreProtocolS2`.</span>
 
-<code>**class** [CailcoGachiStats](#cailcogachistats)([CalicoStatsBase](#calicostatsbase))</code><br>
 <code>**class** [CalicoFesStats](#calicofesstats)([CalicoRegularStats](#calicoregularstats))</code><br>
 <code>**class** [CalicoFesStatsV2](#calicofesstatsv2)([CalicoFesStats](#calicofesstats))</code><br>
-<code>**class** [CalicoLeagueStats](#calicoleaguestats)([CailcoGachiStats](#cailcogachistats))</code><br>
+<code>**class** [CalicoGachiStats](#calicogachistats)([CalicoStatsBase](#calicostatsbase))</code><br>
+<code>**class** [CalicoLeagueStats](#calicoleaguestats)([CalicoGachiStats](#calicogachistats))</code><br>
 <code>**class** [CalicoPlayerResult](#calicoplayerresult)([Structure](common.md))</code><br>
 <code>**class** [CalicoPlayerSimple](#calicoplayersimple)([Structure](common.md))</code><br>
 <code>**class** [CalicoRegularStats](#calicoregularstats)([CalicoStatsBase](#calicostatsbase))</code><br>
 <code>**class** [CalicoStatsBase](#calicostatsbase)([Structure](common.md))</code><br>
+<code>**class** [CalicoXStats](#calicoxstats)([CalicoGachiStats](#calicogachistats))</code><br>
 <code>**class** [CoconutGetInfo](#coconutgetinfo)([Structure](common.md))</code><br>
 <code>**class** [CoconutGetParam](#coconutgetparam)([Structure](common.md))</code><br>
 <code>**class** [CoconutMeta](#coconutmeta)([Structure](common.md))</code><br>
@@ -296,7 +297,7 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def upload_regular_match_result**(stats: [CalicoRegularStats](#calicoregularstats)) -> None</code><br>
 <span class="docs">Calls method `51` on the server.</span>
 
-<code>**async def upload_gachi_match_result**(stats: [CailcoGachiStats](#cailcogachistats)) -> None</code><br>
+<code>**async def upload_gachi_match_result**(stats: [CalicoGachiStats](#calicogachistats)) -> None</code><br>
 <span class="docs">Calls method `52` on the server.</span>
 
 <code>**async def upload_league_match_result**(stats: [CalicoLeagueStats](#calicoleaguestats)) -> None</code><br>
@@ -319,6 +320,9 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 
 <code>**async def upload_fes_match_result_v2**(stats: [CalicoFesStatsV2](#calicofesstatsv2)) -> None</code><br>
 <span class="docs">Calls method `59` on the server.</span>
+
+<code>**async def upload_x_match_result**(stats: [CalicoXStats](#calicoxstats)) -> None</code><br>
+<span class="docs">Calls method `60` on the server.</span>
 
 <code>**async def prepare_post_play_log**(param: [PlayLogPreparePostParam](#playlogpreparepostparam)) -> [DataStoreReqPostInfo](#datastorereqpostinfo)</code><br>
 <span class="docs">Calls method `66` on the server.</span>
@@ -551,7 +555,7 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def upload_regular_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoRegularStats](#calicoregularstats)) -> None</code><br>
 <span class="docs">Handler for method `51`. This method should be overridden by a subclass.</span>
 
-<code>**async def upload_gachi_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CailcoGachiStats](#cailcogachistats)) -> None</code><br>
+<code>**async def upload_gachi_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoGachiStats](#calicogachistats)) -> None</code><br>
 <span class="docs">Handler for method `52`. This method should be overridden by a subclass.</span>
 
 <code>**async def upload_league_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoLeagueStats](#calicoleaguestats)) -> None</code><br>
@@ -575,24 +579,14 @@ Provides a client and server for the `DataStoreProtocolS2`. This page was genera
 <code>**async def upload_fes_match_result_v2**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoFesStatsV2](#calicofesstatsv2)) -> None</code><br>
 <span class="docs">Handler for method `59`. This method should be overridden by a subclass.</span>
 
+<code>**async def upload_x_match_result**(client: [RMCClient](rmc.md#rmcclient), stats: [CalicoXStats](#calicoxstats)) -> None</code><br>
+<span class="docs">Handler for method `60`. This method should be overridden by a subclass.</span>
+
 <code>**async def prepare_post_play_log**(client: [RMCClient](rmc.md#rmcclient), param: [PlayLogPreparePostParam](#playlogpreparepostparam)) -> [DataStoreReqPostInfo](#datastorereqpostinfo)</code><br>
 <span class="docs">Handler for method `66`. This method should be overridden by a subclass.</span>
 
 <code>**async def prepare_get_play_log**(client: [RMCClient](rmc.md#rmcclient), param: [PlayLogPrepareGetParam](#playlogpreparegetparam)) -> [DataStoreReqGetInfo](#datastorereqgetinfo)</code><br>
 <span class="docs">Handler for method `67`. This method should be overridden by a subclass.</span>
-
-## CailcoGachiStats
-<code>**def _\_init__**()</code><br>
-<span class="docs">Creates a new `CailcoGachiStats` instance. Required fields must be filled in manually.</span>
-
-The following fields are defined in this class:<br>
-<span class="docs">
-<code>elapsed_time: int</code><br>
-<code>my_team_count: int</code><br>
-<code>other_team_count: int</code><br>
-<code>udemae: int</code><br>
-<code>estimate_gachi_power: int</code><br>
-</span><br>
 
 ## CalicoFesStats
 <code>**def _\_init__**()</code><br>
@@ -617,6 +611,19 @@ The following fields are defined in this class:<br>
 The following fields are defined in this class:<br>
 <span class="docs">
 <code>other_theme_id: int</code><br>
+</span><br>
+
+## CalicoGachiStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoGachiStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>elapsed_time: int</code><br>
+<code>my_team_count: int</code><br>
+<code>other_team_count: int</code><br>
+<code>udemae: int</code><br>
+<code>estimate_gachi_power: int</code><br>
 </span><br>
 
 ## CalicoLeagueStats
@@ -699,6 +706,18 @@ The following fields are defined in this class:<br>
 <code>battle_num: int</code><br>
 <code>player_rank: int</code><br>
 <code>star_rank: int</code><br>
+</span><br>
+
+## CalicoXStats
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `CalicoXStats` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>crown_players: list[int]</code><br>
+<code>estimate_x_power: int</code><br>
+<code>x_power: int</code><br>
+<code>rank: int</code><br>
 </span><br>
 
 ## CoconutGetInfo
