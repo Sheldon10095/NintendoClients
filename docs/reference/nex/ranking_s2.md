@@ -26,6 +26,10 @@ Provides a client and server for the `RankingProtocolS2`. This page was generate
 <code>**class** [RankingResult](#rankingresult)([Structure](common.md))</code><br>
 <code>**class** [RankingScoreData](#rankingscoredata)([Structure](common.md))</code><br>
 <code>**class** [RankingStats](#rankingstats)([Structure](common.md))</code><br>
+<code>**class** [XPowerGetRankingParam](#xpowergetrankingparam)([Structure](common.md))</code><br>
+<code>**class** [XPowerRanking](#xpowerranking)([Structure](common.md))</code><br>
+<code>**class** [XPowerRankingDetail](#xpowerrankingdetail)([Structure](common.md))</code><br>
+<code>**class** [XPowerUploadParam](#xpoweruploadparam)([Structure](common.md))</code><br>
 
 ## RankingClientS2
 <code>**def _\_init__**(client: [RMCClient](rmc.md#rmcclient) / [HppClient](hpp.md#hppclient))</code><br>
@@ -93,6 +97,12 @@ Provides a client and server for the `RankingProtocolS2`. This page was generate
 
 <code>**async def delete_festival**(festival_id: int) -> None</code><br>
 <span class="docs">Calls method `21` on the server.</span>
+
+<code>**async def upload_x_power**(param: [XPowerUploadParam](#xpoweruploadparam)) -> [XPowerRankingDetail](#xpowerrankingdetail)</code><br>
+<span class="docs">Calls method `22` on the server.</span>
+
+<code>**async def get_x_power_ranking**(params: list[[XPowerGetRankingParam](#xpowergetrankingparam)]) -> list[[XPowerRanking](#xpowerranking)]</code><br>
+<span class="docs">Calls method `23` on the server.</span>
 
 ## RankingServerS2
 <code>**def _\_init__**()</code><br>
@@ -163,6 +173,12 @@ Provides a client and server for the `RankingProtocolS2`. This page was generate
 
 <code>**async def delete_festival**(client: [RMCClient](rmc.md#rmcclient), festival_id: int) -> None</code><br>
 <span class="docs">Handler for method `21`. This method should be overridden by a subclass.</span>
+
+<code>**async def upload_x_power**(client: [RMCClient](rmc.md#rmcclient), param: [XPowerUploadParam](#xpoweruploadparam)) -> [XPowerRankingDetail](#xpowerrankingdetail)</code><br>
+<span class="docs">Handler for method `22`. This method should be overridden by a subclass.</span>
+
+<code>**async def get_x_power_ranking**(client: [RMCClient](rmc.md#rmcclient), params: list[[XPowerGetRankingParam](#xpowergetrankingparam)]) -> list[[XPowerRanking](#xpowerranking)]</code><br>
+<span class="docs">Handler for method `23`. This method should be overridden by a subclass.</span>
 
 ## RankingMode
 This class defines the following constants:<br>
@@ -355,5 +371,65 @@ The following fields are defined in this class:<br>
 The following fields are defined in this class:<br>
 <span class="docs">
 <code>stats: list[float]</code><br>
+</span><br>
+
+## XPowerGetRankingParam
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `XPowerGetRankingParam` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>season_id: str</code><br>
+<code>flag: int</code><br>
+<code>top_ranking_offset: int</code><br>
+<code>top_ranking_limit: int</code><br>
+</span><br>
+
+## XPowerRanking
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `XPowerRanking` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>param: [XPowerGetRankingParam](#xpowergetrankingparam) = [XPowerGetRankingParam](#xpowergetrankingparam)()</code><br>
+<code>status: int</code><br>
+<code>player_num: int</code><br>
+<code>top_rankings: list[[XPowerRankingDetail](#xpowerrankingdetail)]</code><br>
+<code>weapon_ranking: [XPowerRankingDetail](#xpowerrankingdetail) = [XPowerRankingDetail](#xpowerrankingdetail)()</code><br>
+<code>my_ranking: [XPowerRankingDetail](#xpowerrankingdetail) = [XPowerRankingDetail](#xpowerrankingdetail)()</code><br>
+</span><br>
+
+## XPowerRankingDetail
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `XPowerRankingDetail` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>principal_id: int</code><br>
+<code>unique_id: int</code><br>
+<code>rank: int</code><br>
+<code>last_rank: int</code><br>
+<code>name: str</code><br>
+<code>region: int</code><br>
+<code>x_power: int</code><br>
+<code>x_power_max: int</code><br>
+<code>weapon_id: int</code><br>
+<code>application_buffer: bytes</code><br>
+<code>cheater: int</code><br>
+</span><br>
+
+## XPowerUploadParam
+<code>**def _\_init__**()</code><br>
+<span class="docs">Creates a new `XPowerUploadParam` instance. Required fields must be filled in manually.</span>
+
+The following fields are defined in this class:<br>
+<span class="docs">
+<code>season_id: str</code><br>
+<code>name: str</code><br>
+<code>region: int</code><br>
+<code>x_power: int</code><br>
+<code>x_power_max: int</code><br>
+<code>weapon_id: int</code><br>
+<code>application_buffer: bytes</code><br>
 </span><br>
 

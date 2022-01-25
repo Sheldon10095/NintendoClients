@@ -1,12 +1,11 @@
 import ranking;
 
 
-struct FestivalResult {
+// Splatfest Structs
+
+struct FestivalUploadVoteParam {
     uint32 festival_id;
-    uint32 num_participants;
-    list<uint32> team_participants;
-    list<uint32> team_scores;
-    datetime updated_time;
+    uint8 theme_id;
 }
 
 struct FestivalUploadScoreParam {
@@ -20,11 +19,16 @@ struct FestivalUploadScoreParam {
     qbuffer application_buffer;
 }
 
-struct FestivalUploadVoteParam {
+struct FestivalResult {
     uint32 festival_id;
-    uint8 theme_id;
+    uint32 num_participants;
+    list<uint32> team_participants;
+    list<uint32> team_scores;
+    datetime updated_time;
 }
 
+
+// League Structs
 
 struct LeaguePlayerDetail {
     uint64 principal_id;
@@ -50,6 +54,50 @@ struct LeagueResult {
 }
 
 
+// X-Power Structs
+
+struct XPowerUploadParam {
+    string season_id;
+    string name;
+    uint8 region;
+    sint32 x_power;
+    sint32 x_power_max;
+    sint32 weapon_id;
+    qbuffer application_buffer;
+}
+
+struct XPowerGetRankingParam {
+    string season_id;
+    uint8 flag;
+    uint32 top_ranking_offset;
+    uint32 top_ranking_limit;
+}
+
+struct XPowerRankingDetail {
+    uint64 principal_id;
+    uint64 unique_id;
+    sint32 rank;
+    sint32 last_rank;
+    string name;
+    uint8 region;
+    sint32 x_power;
+    sint32 x_power_max;
+    sint32 weapon_id;
+    qbuffer application_buffer;
+    uint32 cheater;
+}
+
+struct XPowerRanking {
+    XPowerGetRankingParam param;
+    uint8 status;
+    sint32 player_num;
+    list<XPowerRankingDetail> top_rankings;
+    XPowerRankingDetail weapon_ranking;
+    XPowerRankingDetail my_ranking;
+}
+
+
+
 protocol Ranking_S2 : Ranking {
 
     method(16) upload_league_point(LeaguePointInfo info) {}
@@ -64,10 +112,15 @@ protocol Ranking_S2 : Ranking {
     method(20) upload_festival_score(FestivalUploadScoreParam upload_param) {}
     method(21) delete_festival(uint32 festival_id) {}
 
+    method(22) upload_x_power(XPowerUploadParam param) {
+        XPowerRankingDetail result;
+    }
+    method(23) get_x_power_ranking(list<XPowerGetRankingParam> params) {
+        list<XPowerRanking> results;
+    }
+    
 
     // Unknown
-    // method(22) upload_x_power(?)
-    // method(23) get_x_power_ranking(?) {?}
     // method(24) upload_event_match_result(?)
     // method(25) get_event_match_result(?) {?}
     // method(26) acquire_event_match_right

@@ -232,34 +232,25 @@ class RankingChangeAttributesParam(common.Structure):
 		stream.u64(self.param)
 
 
-class FestivalResult(common.Structure):
+class FestivalUploadVoteParam(common.Structure):
 	def __init__(self):
 		super().__init__()
 		self.festival_id = None
-		self.num_participants = None
-		self.team_participants = None
-		self.team_scores = None
-		self.updated_time = None
+		self.theme_id = None
 	
 	def check_required(self, settings, version):
-		for field in ['festival_id', 'num_participants', 'team_participants', 'team_scores', 'updated_time']:
+		for field in ['festival_id', 'theme_id']:
 			if getattr(self, field) is None:
 				raise ValueError("No value assigned to required field: %s" %field)
 	
 	def load(self, stream, version):
 		self.festival_id = stream.u32()
-		self.num_participants = stream.u32()
-		self.team_participants = stream.list(stream.u32)
-		self.team_scores = stream.list(stream.u32)
-		self.updated_time = stream.datetime()
+		self.theme_id = stream.u8()
 	
 	def save(self, stream, version):
 		self.check_required(stream.settings, version)
 		stream.u32(self.festival_id)
-		stream.u32(self.num_participants)
-		stream.list(self.team_participants, stream.u32)
-		stream.list(self.team_scores, stream.u32)
-		stream.datetime(self.updated_time)
+		stream.u8(self.theme_id)
 
 
 class FestivalUploadScoreParam(common.Structure):
@@ -301,25 +292,34 @@ class FestivalUploadScoreParam(common.Structure):
 		stream.qbuffer(self.application_buffer)
 
 
-class FestivalUploadVoteParam(common.Structure):
+class FestivalResult(common.Structure):
 	def __init__(self):
 		super().__init__()
 		self.festival_id = None
-		self.theme_id = None
+		self.num_participants = None
+		self.team_participants = None
+		self.team_scores = None
+		self.updated_time = None
 	
 	def check_required(self, settings, version):
-		for field in ['festival_id', 'theme_id']:
+		for field in ['festival_id', 'num_participants', 'team_participants', 'team_scores', 'updated_time']:
 			if getattr(self, field) is None:
 				raise ValueError("No value assigned to required field: %s" %field)
 	
 	def load(self, stream, version):
 		self.festival_id = stream.u32()
-		self.theme_id = stream.u8()
+		self.num_participants = stream.u32()
+		self.team_participants = stream.list(stream.u32)
+		self.team_scores = stream.list(stream.u32)
+		self.updated_time = stream.datetime()
 	
 	def save(self, stream, version):
 		self.check_required(stream.settings, version)
 		stream.u32(self.festival_id)
-		stream.u8(self.theme_id)
+		stream.u32(self.num_participants)
+		stream.list(self.team_participants, stream.u32)
+		stream.list(self.team_scores, stream.u32)
+		stream.datetime(self.updated_time)
 
 
 class LeaguePlayerDetail(common.Structure):
@@ -409,6 +409,150 @@ class LeagueResult(common.Structure):
 		stream.u32(self.match_count)
 
 
+class XPowerUploadParam(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.season_id = None
+		self.name = None
+		self.region = None
+		self.x_power = None
+		self.x_power_max = None
+		self.weapon_id = None
+		self.application_buffer = None
+	
+	def check_required(self, settings, version):
+		for field in ['season_id', 'name', 'region', 'x_power', 'x_power_max', 'weapon_id', 'application_buffer']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.season_id = stream.string()
+		self.name = stream.string()
+		self.region = stream.u8()
+		self.x_power = stream.s32()
+		self.x_power_max = stream.s32()
+		self.weapon_id = stream.s32()
+		self.application_buffer = stream.qbuffer()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.string(self.season_id)
+		stream.string(self.name)
+		stream.u8(self.region)
+		stream.s32(self.x_power)
+		stream.s32(self.x_power_max)
+		stream.s32(self.weapon_id)
+		stream.qbuffer(self.application_buffer)
+
+
+class XPowerGetRankingParam(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.season_id = None
+		self.flag = None
+		self.top_ranking_offset = None
+		self.top_ranking_limit = None
+	
+	def check_required(self, settings, version):
+		for field in ['season_id', 'flag', 'top_ranking_offset', 'top_ranking_limit']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.season_id = stream.string()
+		self.flag = stream.u8()
+		self.top_ranking_offset = stream.u32()
+		self.top_ranking_limit = stream.u32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.string(self.season_id)
+		stream.u8(self.flag)
+		stream.u32(self.top_ranking_offset)
+		stream.u32(self.top_ranking_limit)
+
+
+class XPowerRankingDetail(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.principal_id = None
+		self.unique_id = None
+		self.rank = None
+		self.last_rank = None
+		self.name = None
+		self.region = None
+		self.x_power = None
+		self.x_power_max = None
+		self.weapon_id = None
+		self.application_buffer = None
+		self.cheater = None
+	
+	def check_required(self, settings, version):
+		for field in ['principal_id', 'unique_id', 'rank', 'last_rank', 'name', 'region', 'x_power', 'x_power_max', 'weapon_id', 'application_buffer', 'cheater']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.principal_id = stream.u64()
+		self.unique_id = stream.u64()
+		self.rank = stream.s32()
+		self.last_rank = stream.s32()
+		self.name = stream.string()
+		self.region = stream.u8()
+		self.x_power = stream.s32()
+		self.x_power_max = stream.s32()
+		self.weapon_id = stream.s32()
+		self.application_buffer = stream.qbuffer()
+		self.cheater = stream.u32()
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.u64(self.principal_id)
+		stream.u64(self.unique_id)
+		stream.s32(self.rank)
+		stream.s32(self.last_rank)
+		stream.string(self.name)
+		stream.u8(self.region)
+		stream.s32(self.x_power)
+		stream.s32(self.x_power_max)
+		stream.s32(self.weapon_id)
+		stream.qbuffer(self.application_buffer)
+		stream.u32(self.cheater)
+
+
+class XPowerRanking(common.Structure):
+	def __init__(self):
+		super().__init__()
+		self.param = XPowerGetRankingParam()
+		self.status = None
+		self.player_num = None
+		self.top_rankings = None
+		self.weapon_ranking = XPowerRankingDetail()
+		self.my_ranking = XPowerRankingDetail()
+	
+	def check_required(self, settings, version):
+		for field in ['status', 'player_num', 'top_rankings']:
+			if getattr(self, field) is None:
+				raise ValueError("No value assigned to required field: %s" %field)
+	
+	def load(self, stream, version):
+		self.param = stream.extract(XPowerGetRankingParam)
+		self.status = stream.u8()
+		self.player_num = stream.s32()
+		self.top_rankings = stream.list(XPowerRankingDetail)
+		self.weapon_ranking = stream.extract(XPowerRankingDetail)
+		self.my_ranking = stream.extract(XPowerRankingDetail)
+	
+	def save(self, stream, version):
+		self.check_required(stream.settings, version)
+		stream.add(self.param)
+		stream.u8(self.status)
+		stream.s32(self.player_num)
+		stream.list(self.top_rankings, stream.add)
+		stream.add(self.weapon_ranking)
+		stream.add(self.my_ranking)
+
+
 class RankingProtocolS2:
 	METHOD_UPLOAD_SCORE = 1
 	METHOD_DELETE_SCORE = 2
@@ -431,6 +575,8 @@ class RankingProtocolS2:
 	METHOD_UPLOAD_FESTIVAL_VOTE = 19
 	METHOD_UPLOAD_FESTIVAL_SCORE = 20
 	METHOD_DELETE_FESTIVAL = 21
+	METHOD_UPLOAD_X_POWER = 22
+	METHOD_GET_X_POWER_RANKING = 23
 	
 	PROTOCOL_ID = 0x70
 
@@ -759,6 +905,36 @@ class RankingClientS2(RankingProtocolS2):
 		if not stream.eof():
 			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
 		logger.info("RankingClientS2.delete_festival -> done")
+	
+	async def upload_x_power(self, param):
+		logger.info("RankingClientS2.upload_x_power()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.add(param)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_UPLOAD_X_POWER, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		result = stream.extract(XPowerRankingDetail)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("RankingClientS2.upload_x_power -> done")
+		return result
+	
+	async def get_x_power_ranking(self, params):
+		logger.info("RankingClientS2.get_x_power_ranking()")
+		#--- request ---
+		stream = streams.StreamOut(self.settings)
+		stream.list(params, stream.add)
+		data = await self.client.request(self.PROTOCOL_ID, self.METHOD_GET_X_POWER_RANKING, stream.get())
+		
+		#--- response ---
+		stream = streams.StreamIn(data, self.settings)
+		results = stream.list(XPowerRanking)
+		if not stream.eof():
+			raise ValueError("Response is bigger than expected (got %i bytes, but only %i were read)" %(stream.size(), stream.tell()))
+		logger.info("RankingClientS2.get_x_power_ranking -> done")
+		return results
 
 
 class RankingServerS2(RankingProtocolS2):
@@ -785,6 +961,8 @@ class RankingServerS2(RankingProtocolS2):
 			self.METHOD_UPLOAD_FESTIVAL_VOTE: self.handle_upload_festival_vote,
 			self.METHOD_UPLOAD_FESTIVAL_SCORE: self.handle_upload_festival_score,
 			self.METHOD_DELETE_FESTIVAL: self.handle_delete_festival,
+			self.METHOD_UPLOAD_X_POWER: self.handle_upload_x_power,
+			self.METHOD_GET_X_POWER_RANKING: self.handle_get_x_power_ranking,
 		}
 	
 	async def logout(self, client):
@@ -1000,6 +1178,28 @@ class RankingServerS2(RankingProtocolS2):
 		festival_id = input.u32()
 		await self.delete_festival(client, festival_id)
 	
+	async def handle_upload_x_power(self, client, input, output):
+		logger.info("RankingServerS2.upload_x_power()")
+		#--- request ---
+		param = input.extract(XPowerUploadParam)
+		response = await self.upload_x_power(client, param)
+		
+		#--- response ---
+		if not isinstance(response, XPowerRankingDetail):
+			raise RuntimeError("Expected XPowerRankingDetail, got %s" %response.__class__.__name__)
+		output.add(response)
+	
+	async def handle_get_x_power_ranking(self, client, input, output):
+		logger.info("RankingServerS2.get_x_power_ranking()")
+		#--- request ---
+		params = input.list(XPowerGetRankingParam)
+		response = await self.get_x_power_ranking(client, params)
+		
+		#--- response ---
+		if not isinstance(response, list):
+			raise RuntimeError("Expected list, got %s" %response.__class__.__name__)
+		output.list(response, output.add)
+	
 	async def upload_score(self, *args):
 		logger.warning("RankingServerS2.upload_score not implemented")
 		raise common.RMCError("Core::NotImplemented")
@@ -1082,5 +1282,13 @@ class RankingServerS2(RankingProtocolS2):
 	
 	async def delete_festival(self, *args):
 		logger.warning("RankingServerS2.delete_festival not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def upload_x_power(self, *args):
+		logger.warning("RankingServerS2.upload_x_power not implemented")
+		raise common.RMCError("Core::NotImplemented")
+	
+	async def get_x_power_ranking(self, *args):
+		logger.warning("RankingServerS2.get_x_power_ranking not implemented")
 		raise common.RMCError("Core::NotImplemented")
 
